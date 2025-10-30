@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NovaSearch – Smarter AI Search</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body{background:radial-gradient(circle at 50% -10%,#1e1b4b 0%,#020617 100%);color:#e2e8f0;font-family:'Inter',sans-serif}
+  .glass{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(12px);transition:all .3s ease}
+  .glass:hover{border-color:rgba(255,255,255,.2)}
+  .neon{text-shadow:0 0 8px #818cf8,0 0 16px #6366f1}
+  .cursor{display:inline-block;width:6px;background:#818cf8;animation:blink 1s infinite;margin-left:2px}
+  @keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+  .fade-in{animation:fade .6s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-6">
+
+<header class="text-center mt-10 mb-10">
+  <h1 class="text-5xl font-extrabold text-indigo-400 neon">NovaSearch</h1>
+  <p class="text-sm text-gray-400 mt-2">AI • Speed • Simplicity</p>
+</header>
+
+<main class="w-full max-w-3xl fade-in">
+  <form id="searchForm" class="flex flex-col sm:flex-row w-full mb-6">
+    <input id="queryInput" type="text" placeholder="Search the universe…" 
+      class="flex-1 px-5 py-3 rounded-t-lg sm:rounded-l-lg sm:rounded-tr-none bg-gray-900 text-gray-200 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+    <button type="submit"
+      class="bg-indigo-600 hover:bg-indigo-500 px-6 py-3 rounded-b-lg sm:rounded-r-lg sm:rounded-bl-none font-semibold transition">
+      Search
+    </button>
+  </form>
+
+  <!-- quick links -->
+  <section id="otherEngines" class="glass p-4 rounded-xl mb-6 text-center text-sm">
+    <p class="text-gray-300 mb-2">Try your search on:</p>
+    <div class="flex flex-wrap justify-center gap-2">
+      <a id="googleLink" href="https://google.com" target="_blank" class="bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded-lg">Google</a>
+      <a id="bingLink" href="https://bing.com" target="_blank" class="bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded-lg">Bing</a>
+      <a id="duckLink" href="https://duckduckgo.com" target="_blank" class="bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded-lg">DuckDuckGo</a>
+      <a id="yahooLink" href="https://search.yahoo.com" target="_blank" class="bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded-lg">Yahoo</a>
+    </div>
+  </section>
+
+  <!-- summary -->
+  <section id="aiSummary" class="hidden glass rounded-xl p-5 mb-6 fade-in">
+    <h2 class="text-lg font-semibold mb-2 text-indigo-300">AI Summary</h2>
+    <p id="summaryText" class="text-gray-300 text-sm leading-relaxed"></p><span id="cursor" class="cursor"></span>
+  </section>
+
+  <!-- results -->
+  <section id="resultsContainer" class="space-y-4"></section>
+
+  <div class="glass mt-8 p-4 rounded-xl text-sm text-center text-gray-300">
+    <strong>Sponsored:</strong><br>Upgrade productivity with <span class="text-indigo-400 font-semibold">NovaPro AI Tools</span> 🚀
+  </div>
+
+  <div class="glass mt-4 p-4 rounded-xl text-center">
+    <span class="text-indigo-400 font-semibold">NovaSearch Premium</span><br>No ads • Real-time AI answers • Personal insights
+  </div>
+</main>
+
+<footer class="mt-12 text-gray-500 text-xs text-center space-x-3">
+  <a href="#" class="hover:text-indigo-400">About</a>
+  <a href="#" class="hover:text-indigo-400">Privacy</a>
+  <a href="#" class="hover:text-indigo-400">Contact</a><br>
+  © <span id="year"></span> NovaSearch
+</footer>
+
+<script>
+const qInput=document.getElementById("queryInput"),
+form=document.getElementById("searchForm"),
+summaryBox=document.getElementById("aiSummary"),
+summaryText=document.getElementById("summaryText"),
+cursor=document.getElementById("cursor"),
+results=document.getElementById("resultsContainer"),
+y=document.getElementById("year");
+y.textContent=new Date().getFullYear();
+
+function updateLinks(q){
+  document.getElementById("googleLink").href=`https://www.google.com/search?q=${encodeURIComponent(q)}`;
+  document.getElementById("bingLink").href=`https://www.bing.com/search?q=${encodeURIComponent(q)}`;
+  document.getElementById("duckLink").href=`https://duckduckgo.com/?q=${encodeURIComponent(q)}`;
+  document.getElementById("yahooLink").href=`https://search.yahoo.com/search?p=${encodeURIComponent(q)}`;
+}
+
+const aiOpeners=[
+  "Here’s what Nova AI found:",
+  "According to our data fusion:",
+  "Quick insight from Nova Intelligence:",
+  "Summarized findings:"
+];
+
+function typeEffect(el,text,delay=25){
+  el.textContent="";cursor.style.display="inline-block";
+  let i=0;
+  const t=setInterval(()=>{if(i<text.length){el.textContent+=text.charAt(i);i++}
+    else{clearInterval(t);cursor.style.display="none"}},delay);
+}
+
+function mockResults(q){
+  return[
+    {title:`What is ${q}?`,snippet:`An overview of ${q}, compiled by Nova’s AI dataset.`,url:"#"},
+    {title:`Latest trends on ${q}`,snippet:`Up-to-date discussions, stats and opinions about ${q}.`,url:"#"},
+    {title:`Experts talk about ${q}`,snippet:`Analysis and context from leading sources on ${q}.`,url:"#"}
+  ];
+}
+
+form.addEventListener("submit",e=>{
+  e.preventDefault();
+  const q=qInput.value.trim();
+  if(!q)return;
+  updateLinks(q);
+  summaryBox.classList.remove("hidden");
+  results.innerHTML="";
+  const open=aiOpeners[Math.floor(Math.random()*aiOpeners.length)];
+  typeEffect(summaryText,`${open} "${q}" is a topic gaining attention globally — here’s a concise summary.`,25);
+  mockResults(q).forEach(r=>{
+    const d=document.createElement("div");
+    d.className="glass p-4 rounded-xl hover:bg-gray-800 transition fade-in";
+    d.innerHTML=`<a href="${r.url}" class="text-indigo-400 font-semibold text-lg hover:underline">${r.title}</a>
+    <p class="text-sm text-gray-300 mt-1">${r.snippet}</p>`;
+    results.appendChild(d);
+  });
+});
+</script>
+</body>
+</html>
